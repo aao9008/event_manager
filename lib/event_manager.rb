@@ -13,7 +13,7 @@ puts Dir.pwd
 # check if file exists
 puts(File.exist? 'event_attendees.csv')
 
-def clean_zipcode(zipcode)
+def phone_zipcode(zipcode)
   zipcode.to_s.rjust(5, '0')[0..4]
 end
 
@@ -46,6 +46,18 @@ def save_thankyou_letter(id, form_letter)
   end
 end
 
+def clean_phone_number(phone_number)
+  phone_number = phone_number.delete("^0-9")
+  if phone_number.length == 10
+    phone_number
+  elsif phone_number.length == 11
+    phone_number.slice(1, 10) if phone_number[0].to_i == 1.to_i
+  else
+    "Bad Number!"
+  end
+end
+
+
 
 # Open CSV file
 contents = CSV.open('event_attendees.csv', headers: true, header_converters: :symbol)
@@ -57,7 +69,11 @@ contents.each do |row|
   id = row[0]
   name = row[:first_name]
 
-  zipcode = clean_zipcode(row[:zipcode])
+  zipcode = phone_zipcode(row[:zipcode])
+
+  phone_number = clean_phone_number(row[:homephone])
+
+  puts phone_number
 
   legislators = legislators_by_zipcode(zipcode)
 
